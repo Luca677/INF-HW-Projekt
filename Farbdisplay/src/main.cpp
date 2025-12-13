@@ -55,7 +55,7 @@ void fillScreen(uint16_t color) {
   writeData((320 - 1) & 0xFF);
 
   // RAM write
-  writeCommand(0x2C);
+  writeCommand(0x2C); //Display erwartet Pixeldaten
 
   digitalWrite(dc, HIGH);
   digitalWrite(cs, LOW);
@@ -80,7 +80,7 @@ void setup() {
 
   tftInit(); // Display starten
 
-  fillScreen(0xF800);  // ROT anzeigen
+  fillScreen(0xF800);  // ROT anzeigen mit Wert 11111(R) 000000(G) 00000(B)
 
 }
 
