@@ -85,7 +85,7 @@ void setup() {
 }
 
 void loop() {
-  fillScreen(0xF800);// ROT anzeigen
+  
 }
 
 
