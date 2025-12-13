@@ -80,11 +80,12 @@ void setup() {
 
   tftInit(); // Display starten
 
-  fillScreen(0xF800);  // ROT anzeigen
+    
 
 }
 
 void loop() {
-  
+  fillScreen(0xF800);// ROT anzeigen
 }
+
 
