@@ -12,11 +12,9 @@
 Adafruit_ILI9341 tft(TFT_CS, TFT_DC, TFT_RST);
 
 void setup() {
-  // SPI-PINS FEST setzen (EXTREM WICHTIG)
-  SPI.setMOSI(PA7);
   SPI.setMISO(PA6);
-  SPI.setSCK(PA5);
-
+  SPI.setMOSI(PA7);
+  SPI.setSCLK(PA5);
   SPI.begin();
 
   tft.begin();
@@ -32,4 +30,5 @@ void setup() {
 }
 
 void loop() {
+  
 }
