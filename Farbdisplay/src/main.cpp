@@ -4,9 +4,9 @@
 #include <Adafruit_ILI9341.h>
 
 // ===== PIN-DEFINITION =====
-#define TFT_CS   PB6
-#define TFT_DC   PB7
-#define TFT_RST  PB8
+#define TFT_CS   PB6  //Chip select signal
+#define TFT_DC   PB7  // LCD Register /data selection signal
+#define TFT_RST  PB8  // LCD reset signal
 
 // ===== DISPLAY =====
 Adafruit_ILI9341 tft(TFT_CS, TFT_DC, TFT_RST);
@@ -27,8 +27,11 @@ void setup() {
 
   // TEST: kompletter Screen ROT
   tft.fillScreen(ILI9341_RED);
+  // TEST: Ausgabe
+  tft.setTextSize(2);
+  tft.setTextColor(ILI9341_BLUE);
+  tft.print("Hello World");
 }
-
 void loop() {
   
 }
