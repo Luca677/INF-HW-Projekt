@@ -19,8 +19,8 @@ void setup() {
 
   tft.begin();
 
-  // Rotation korrekt setzen (verhindert schwarze Bereiche!)
-  tft.setRotation(1); // 0..3 ausprobieren falls nötig
+  // Rotation korrekt setzen
+  tft.setRotation(1); // 0 bis 3 immer um 90 Grad gedreht = 0 Standard 1 = 90 Grad gedreht usw
 
   // Bildschirm löschen
   tft.fillScreen(ILI9341_BLACK);
