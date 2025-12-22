@@ -18,19 +18,16 @@ void setup() {
   SPI.begin();
 
   tft.begin();
-
   // Rotation korrekt setzen (verhindert schwarze Bereiche!)
   tft.setRotation(1); // 0..3 ausprobieren falls nötig
-
   // Bildschirm löschen
   tft.fillScreen(ILI9341_BLACK);
-
   // TEST: kompletter Screen ROT
   tft.fillScreen(ILI9341_RED);
   // TEST: Ausgabe
   tft.setTextSize(2);
   tft.setTextColor(ILI9341_BLUE);
-  tft.print("Hello World");
+  tft.printf("Guten tag! %-100s %100s", "\xB0C", "\xE4\xF6\xFC\xDF");
 }
 void loop() {
   
