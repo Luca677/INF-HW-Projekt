@@ -7,6 +7,12 @@
 #define TFT_CS   PB6  //Chip select signal
 #define TFT_DC   PB7  // LCD Register /data selection signal
 #define TFT_RST  PB8  // LCD reset signal
+#define TFT_MOSI PA7  // LCD MOSI signal
+#define TFT_SCLK PA5  // LCD Clock signal
+#define TFT_MISO PA6  // LCD MISO signal
+#define T_CS     PB9  // Touchscreen chip select
+#define T_IRQ    PB10  // Touchscreen interrupt
+
 
 // ===== DISPLAY =====
 Adafruit_ILI9341 tft(TFT_CS, TFT_DC, TFT_RST);
