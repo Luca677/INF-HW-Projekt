@@ -5,8 +5,8 @@
 #include <XPT2046_Touchscreen.h>
 
 //Pinbelegung TFT 2.8" ILI9341 mit Touch XPT2046
-// 1          3.3V
-// 2          GND
+// 1             3.3V
+// 2             GND
 // 3   TFT_CS    PB6
 // 4   TFT_Reset PB8
 // 5   TFT_DC    PB7
@@ -35,13 +35,13 @@
 #define BTN1_Y 80
 #define BTN2_X 40
 #define BTN2_Y 150
-//Touch
+//Touchkoordinaten kalibrieren
 int xMin = 300;
 int xMax = 3800;
 int yMin = 300;
 int yMax = 3700;
 
-Adafruit_ILI9341 tft(TFT_CS, TFT_DC, TFT_RST);
+Adafruit_ILI9341 tft(TFT_CS, TFT_DC, TFT_RST);  // Display Objekt erstellen
 XPT2046_Touchscreen touch(TOUCH_CS, TOUCH_IRQ); // nur CS + IRQ
 
 void drawButton()
@@ -61,7 +61,7 @@ void drawButton()
 
 }
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(115200); // Serielle Schnittstelle starten für Debugausgaben
 
   // Display-Pins
   pinMode(TFT_CS, OUTPUT);
@@ -74,14 +74,14 @@ void setup() {
 
   // Display starten
   tft.begin();
-  tft.fillScreen(ILI9341_BLACK);
-  tft.setRotation(1);
+  tft.fillScreen(ILI9341_BLACK); // alles löschen
+  tft.setRotation(1);           // Querformat
 
 
   // Touch starten
   touch.begin();
   touch.setRotation(1);
-
+  //Displayeinstellungen
   tft.setTextSize(2);
   tft.setTextColor(ILI9341_GREEN);
   tft.setCursor(10, 10);
@@ -101,29 +101,32 @@ void loop() {
     int X = map(p.x, 300, 3800, 0, 320);
     int Y = map(p.y, 300, 3700, 0, 240);
 
-    X = constrain(X, 0, 319);
-    Y = constrain(Y, 0, 239);
+    X = constrain(X, 0, 319); // X Wert auf einen Wert zwischen 0 und 319 begrenzen
+    X = constrain(Y, 0, 239); // X Wert auf einen Wert zwischen 0 und 239 begrenzen
     
     X = 319 - X; // Spiegeln X
     Y = 239 - Y; // Spiegeln Y
+
     Serial.print("X = "); Serial.print(X);
     Serial.print("  Y = "); Serial.println(Y);
-    tft.fillCircle(X,Y, 3, ILI9341_YELLOW);
-    if(X > BTN1_X && X< BTN1_X + BTN_W && Y > BTN1_Y && Y < BTN1_Y + BTN_H){
-      tft.fillRect(0, 0, 320, 20, ILI9341_BLACK);
-      tft.setCursor(10, 10);
-      tft.setTextColor(ILI9341_GREEN);
-      tft.print("Button 1 gedrueckt");
-      delay(500);
-    }
-    if(X > BTN2_X && X< BTN2_X + BTN_W && Y > BTN2_Y && Y < BTN2_Y + BTN_H){
-      tft.fillRect(0, 0, 320, 20, ILI9341_BLACK);
-      tft.setCursor(10, 10);
-      tft.setTextColor(ILI9341_GREEN);
-      tft.print("Button 2 gedrueckt");
-      delay(500);
-    }
+    tft.fillCircle(X,Y, 3, ILI9341_YELLOW);  // Test Touchpunkt
+
+      if(X > BTN1_X && X< BTN1_X + BTN_W && Y > BTN1_Y && Y < BTN1_Y + BTN_H){
+        tft.fillRect(0, 0, 320, 20, ILI9341_BLACK);
+        tft.setCursor(10, 10);
+        tft.setTextColor(ILI9341_GREEN);
+        tft.setTextSize(2);
+        tft.println("Button 1 gedrueckt");
+        delay(500);
+      }
+      if(X > BTN2_X && X< BTN2_X + BTN_W && Y > BTN2_Y && Y < BTN2_Y + BTN_H){
+        tft.fillRect(0, 0, 320, 20, ILI9341_BLACK);
+        tft.setCursor(10, 10);
+        tft.setTextColor(ILI9341_GREEN);
+        tft.setTextSize(2);
+        tft.println("Button 2 gedrueckt");
+        delay(500);
+      }
   }
-  delay(5);
-  
+  delay(5); 
 }
