@@ -1,3 +1,4 @@
+#if 0
 #include <Arduino.h>
 #include <SPI.h>
 #include <Adafruit_GFX.h>
@@ -135,3 +136,4 @@ void loop() {
     delay(5);
   }
 }
+#endif
