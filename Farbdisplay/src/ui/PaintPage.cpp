@@ -9,22 +9,29 @@ static bool inRect(int x, int y, int w, int h, int tx, int ty) {
 
 void drawColorWheel(Adafruit_ILI9341& tft)
 {
-    int radX = 50;
-    int radY = 50;
-    int radR = 40;
-    for(int angle = 0; angle<360; angle++)
-    {
-        float rad = angle * PI /180.0;
-        for(int r = 0; r<radR; r++)
-        {
-            int px = radX + r * cos(rad);
-            int py = radY + r * sin(rad);
-            // RGB-Farben
-            uint8_t red = (uint8_t)(127.5*(1+cos(rad)));
-            uint8_t green = (uint8_t)(127.5*(1+cos(rad - (2*PI/3))));
-            uint8_t blue = (uint8_t)(127.5*(1+cos(rad - (4*PI/3))));
-            tft.drawPixel(px, py , tft.color565(red, green, blue));
+    int radX = 50; // X-Koordinate des Mittelpunkts
+    int radY = 50; // Y-Koordinate des Mittelpunkts
+    int radR = 40; // Radius des Farb-Rads
 
+    // Schleife über alle Winkel von 0° bis 359°
+    for(int angle = 0; angle < 360; angle++)
+    {
+        float rad = angle * PI / 180.0;  // Grad → Radiant
+
+        // Schleife vom Zentrum bis zum Rand
+        for(int r = 0; r < radR; r++)
+        {
+            // Pixelkoordinaten berechnen
+            int px = radX + round(r * cos(rad));
+            int py = radY + round(r * sin(rad));
+
+            // RGB-Farben berechnen
+            uint8_t red   = (uint8_t)(127.5 * (1 + cos(rad)));           // Rotanteil
+            uint8_t green = (uint8_t)(127.5 * (1 + cos(rad - 2*PI/3)));  // Grünanteil, 120° versetzt
+            uint8_t blue  = (uint8_t)(127.5 * (1 + cos(rad - 4*PI/3)));  // Blauanteil, 240° versetzt
+
+            // Pixel auf dem TFT setzen
+            tft.drawPixel(px, py, tft.color565(red, green, blue));
         }
     }
 }
