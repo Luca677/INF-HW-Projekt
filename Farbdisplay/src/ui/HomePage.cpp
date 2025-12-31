@@ -1,5 +1,5 @@
 #include "HomePage.h"
-
+#include "assets/menu_bitmap.h"
 #define BTN_W 180
 #define BTN_H 50
 
@@ -8,20 +8,8 @@ static bool inRect(int x, int y, int w, int h, int tx, int ty) {
 }
 
 void HomePage::draw(Adafruit_ILI9341& tft) {
-    tft.fillScreen(ILI9341_BLACK);
-    tft.setCursor(10, 10);
-    tft.setTextColor(ILI9341_YELLOW);
-    tft.setTextSize(2);
-    tft.print("Home Page");
+    tft.drawRGBBitmap(0, 0, menuBitmap, MENU_W, MENU_H);
 
-    tft.fillRoundRect(70, 80, BTN_W, BTN_H, 8, ILI9341_BLUE);
-    tft.setCursor(100, 98);
-    tft.setTextColor(ILI9341_WHITE);
-    tft.print("Settings");
-
-    tft.fillRoundRect(70, 150, BTN_W, BTN_H, 8, ILI9341_GREEN);
-    tft.setCursor(130, 168);
-    tft.print("Info");
 }
 
 PageID HomePage::handleTouch(int x, int y) {
@@ -30,6 +18,8 @@ PageID HomePage::handleTouch(int x, int y) {
 
     if (inRect(70, 150, BTN_W, BTN_H, x, y))
         return PageID::INFO;
-
+    if (inRect(80, 95, 160, 50, x, y)) {
+        return PageID::PAINT;
+    }
     return PageID::HOME;
 }
