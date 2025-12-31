@@ -1,7 +1,7 @@
 #include "ui/SettingsPage.h"
 
 static bool inRect(int x, int y, int w, int h, int tx, int ty) {
-    return tx > x && tx < x + w && ty > y && ty < y + h;
+    return tx >= x && tx < x + w && ty >= y && ty < y + h;
 }
 
 void SettingsPage::draw(Adafruit_ILI9341& tft) {
