@@ -33,50 +33,58 @@ PageID PaintPage::handleTouch(int x, int y, PageController& controller) {
     Serial.print(" , ");
     Serial.println(y);
 
-    if (controller.getCurrentPage() != PageID::PAINT)
+    if (controller.getCurrentPage() != PageID::PAINT) {
         return PageID::PAINT;
-    if (inRect(18, 4, 40, 42, x, y)) // Stift
-    /* return ... */;    // 2 Button Radiergummi (60-4) -> (98-46)
-
-    if (inRect(60, 4, 38, 42, x, y)) // Radiergummi
-
-    /* return ... */;// 3 Button Groß (102-4) -> (138-46)
-
-    if (inRect(102, 4, 36, 42, x, y)) // Groß
+    }
+    if (inRect(18, 4, 40, 42, x, y)) { // Stift 
         /* return ... */;
-        // 4 Button Mittel (142-4) -> (178-46)
-
-    if (inRect(142, 4, 36, 42, x, y)) // Mittel
+    }
+    // 2 Button Radiergummi (60-4) -> (98-46)
+    if (inRect(60, 4, 38, 42, x, y)) { // Radiergummi
         /* return ... */;
-        // 5 Button Klein (184-4) -> (218-46)
-
-    if (inRect(184, 4, 34, 42, x, y)) // Klein
+    }
+    // 3 Button Groß (102-4) -> (138-46)    
+    if (inRect(102, 4, 36, 42, x, y)) { // Groß
         /* return ... */;
-        // 6 Button Undo (226-4) -> (248-46)
+    }
+    // 4 Button Mittel (142-4) -> (178-46)
 
-    if (inRect(226, 4, 22, 42, x, y)) // Undo
+    if (inRect(142, 4, 36, 42, x, y)) { // Mittel
         /* return ... */;
-        // 7 Button Redo (268-4) -> (288-46)
+    }
+    // 5 Button Klein (184-4) -> (218-46)
 
-    if (inRect(268, 4, 20, 42, x, y)) // Redo
+    if (inRect(184, 4, 34, 42, x, y)) { // Klein
         /* return ... */;
-        // 8 Button Hauptmenü (0-78) -> (14-212)
+    }
+    // 6 Button Undo (226-4) -> (248-46)
 
-    if (inRect(0, 78, 14, 134, x, y)) // Hauptmenü
+    if (inRect(226, 4, 22, 42, x, y)) { // Undo
+        /* return ... */;
+    }
+    // 7 Button Redo (268-4) -> (288-46)
+
+    if (inRect(268, 4, 20, 42, x, y)) { // Redo
+        /* return ... */;
+    }
+    // 8 Button Hauptmenü (0-78) -> (14-212)
+
+    if (inRect(0, 78, 14, 134, x, y)) { // Hauptmenü
         Serial.println("Hauptmenü gedrückt");
         return PageID::HOME;
-        // 9 Button Fläche (18-52) -> (300-234)
+    }
+    // 9 Button Fläche (18-52) -> (300-234)
 
     // Hinweis: y oben/unten ggf. noch vergrößern
-    if (inRect(18, 52, 282, 182, x, y)) // Fläche
+    if (inRect(18, 52, 282, 182, x, y)) { // Fläche
         /* return ... */;
-        // 10 Button Löschen (302-74) -> (318-208)
+    }
+    // 10 Button Löschen (302-74) -> (318-208)
 
     // Hinweis: y oben/unten ggf. noch vergrößern
-    if (inRect(302, 74, 16, 134, x, y)) // Löschen
+    if (inRect(302, 74, 16, 134, x, y)) { // Löschen
         /* return ... */;
-    
+    }
 
-    
     return PageID::PAINT;
 }
