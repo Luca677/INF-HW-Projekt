@@ -19,7 +19,6 @@ void setup() {
     Serial.begin(115200);
     display.begin();
     touch.begin();
-    display.tft().setRotation(settings.rotation);
 
     pages.add(PageID::HOME, &home);
     pages.add(PageID::SETTINGS, &settings);
