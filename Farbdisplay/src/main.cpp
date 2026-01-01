@@ -16,6 +16,7 @@ InfoPage info;
 PaintPage paint;
 
 void setup() {
+    Serial.begin(115200);
     display.begin();
     touch.begin();
 
@@ -31,6 +32,9 @@ void setup() {
 void loop() {
     auto p = touch.read();
     if (!p.valid) return;
+
+    Serial.print("CURRENT PAGE: ");
+    Serial.println((int)pages.getCurrentPage());
 
     pages.touch(p.x, p.y, display.tft());
 }

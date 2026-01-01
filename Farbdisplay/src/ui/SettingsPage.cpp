@@ -19,7 +19,7 @@ void SettingsPage::draw(Adafruit_ILI9341& tft) {
     tft.print("Back");
 }
 
-PageID SettingsPage::handleTouch(int x, int y) {
+PageID SettingsPage::handleTouch(int x, int y, PageController& controller) {
     // Back Button
     if (inRect(10, 190, 100, 40, x, y))
         return PageID::HOME;

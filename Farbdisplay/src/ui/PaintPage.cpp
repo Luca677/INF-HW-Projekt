@@ -1,74 +1,82 @@
 #include "ui/PaintPage.h"
+#include "assets/Paint_Bitmap.h"
+#include "ui/PageController.h"
 #include <Adafruit_ILI9341.h>
 #include <math.h>
 #define BTN_W 60
 #define BTN_H 30
 
-
 //BUTTONS
-//1 Button 18-4 & 58-46
-//2 Button 60-4 & 98-46
-//3 Button 102-4 & 138-46
-//4 Button 142-4 & 178-46
-//5 Button 184-4 & 218-46
-//6 Button 226-4 & 248-46
-//7 Button 268-4 & 288-46
+//1 Button Stift 18-4 & 58-46
+//2 Button Radiergummi 60-4 & 98-46
+//3 Button Groß 102-4 & 138-46
+//4 Button Mittel 142-4 & 178-46
+//5 Button Klein 184-4 & 218-46
+//6 Button Undo 226-4 & 248-46
+//7 Button Redo 268-4 & 288-46
+//8 Button Hauptmenü 0-78 & 14-212
+//9 Button Fläche 18-52 & 300-234 (y noch unten und oben erhöhen!)
+//10 Button Löschen 302-74 & 318 208 (y noch unten und oben erhöhen!)
+
 static bool inRect(int x, int y, int w, int h, int tx, int ty) {
     return tx >= x && tx < x + w && ty >= y && ty < y + h;
 }
-// Schnell und lückenfrei: Farb-Rad zeichnen
-void drawColorWheel(Adafruit_ILI9341& tft, int radX = 50, int radY = 80, int radR = 40)
-{
-    // Schleife über Winkel mit halbem Grad Schritt für dichte Darstellung
-    for(float angle = 0; angle < 360; angle += 0.5) 
-    {
-        float rad = angle * PI / 180.0; // Grad → Radiant
-
-        // Vom Mittelpunkt bis zum Rand jeden Pixel setzen
-        for(int r = 0; r < radR; r++)
-        {
-            // Pixelkoordinaten berechnen und runden
-            int px = radX + (int)(r * cos(rad) + 0.5f); // X-Koordinate in Float umwandeln um Pixelfehler zu vermeiden
-            int py = radY + (int)(r * sin(rad) + 0.5f); // Y-Koordinate in Float umwandeln um Pixelfehler zu vermeiden
-
-            // RGB-Farben berechnen
-            uint8_t red   = (uint8_t)(127.5 * (1 + cos(rad)));           // Rotanteil
-            uint8_t green = (uint8_t)(127.5 * (1 + cos(rad - 2*PI/3)));  // Grün, 120° versetzt
-            uint8_t blue  = (uint8_t)(127.5 * (1 + cos(rad - 4*PI/3)));  // Blau, 240° versetzt
-
-            // Pixel setzen
-            tft.drawPixel(px, py, tft.color565(red, green, blue));
-        }
-    }
-    tft.drawRect(10, 40, 80, 80, ILI9341_WHITE); // Außenrahmen
-}
-
 
 void PaintPage::draw(Adafruit_ILI9341& tft){
-    tft.fillScreen(ILI9341_BLACK);
-    tft.setCursor(10, 10);
-    tft.setTextColor(ILI9341_YELLOW);
-    tft.setTextSize(1);
-    tft.print("Zeichenflaeche");
-    
-    // Back-Button
-    tft.fillRoundRect(10, 190, 100, 40, 6, ILI9341_RED);
-    tft.setCursor(30, 203);
-    tft.setTextColor(ILI9341_WHITE);
-    tft.print("Back");
-
-    drawColorWheel(tft);
+   tft.drawRGBBitmap(0, 0, paintBitmap, PAINT_W, PAINT_H); 
 }
 
-PageID PaintPage::handleTouch(int x, int y) {
-    if (inRect(10, 190, 100, 40, x, y))
+// 1 Button Stift (18-4) -> (58-46)
+PageID PaintPage::handleTouch(int x, int y, PageController& controller) {
+    Serial.print("PaintPage::handleTouch");
+    Serial.print(x);
+    Serial.print(" , ");
+    Serial.println(y);
+
+    if (controller.getCurrentPage() != PageID::PAINT)
+        return PageID::PAINT;
+    if (inRect(18, 4, 40, 42, x, y)) // Stift
+    /* return ... */;    // 2 Button Radiergummi (60-4) -> (98-46)
+
+    if (inRect(60, 4, 38, 42, x, y)) // Radiergummi
+
+    /* return ... */;// 3 Button Groß (102-4) -> (138-46)
+
+    if (inRect(102, 4, 36, 42, x, y)) // Groß
+        /* return ... */;
+        // 4 Button Mittel (142-4) -> (178-46)
+
+    if (inRect(142, 4, 36, 42, x, y)) // Mittel
+        /* return ... */;
+        // 5 Button Klein (184-4) -> (218-46)
+
+    if (inRect(184, 4, 34, 42, x, y)) // Klein
+        /* return ... */;
+        // 6 Button Undo (226-4) -> (248-46)
+
+    if (inRect(226, 4, 22, 42, x, y)) // Undo
+        /* return ... */;
+        // 7 Button Redo (268-4) -> (288-46)
+
+    if (inRect(268, 4, 20, 42, x, y)) // Redo
+        /* return ... */;
+        // 8 Button Hauptmenü (0-78) -> (14-212)
+
+    if (inRect(0, 78, 14, 134, x, y)) // Hauptmenü
+        Serial.println("Hauptmenü gedrückt");
         return PageID::HOME;
-    if(drawing == true && inRect(10, 40, 80, 80 , x ,y))
-    {
-        drawing = false;
-        float dx = x -50;
-        float dy = y-80;
-        float angle = atan2(dy, dx); // Winkel in Radiant
-    }
+        // 9 Button Fläche (18-52) -> (300-234)
+
+    // Hinweis: y oben/unten ggf. noch vergrößern
+    if (inRect(18, 52, 282, 182, x, y)) // Fläche
+        /* return ... */;
+        // 10 Button Löschen (302-74) -> (318-208)
+
+    // Hinweis: y oben/unten ggf. noch vergrößern
+    if (inRect(302, 74, 16, 134, x, y)) // Löschen
+        /* return ... */;
+    
+
+    
     return PageID::PAINT;
 }

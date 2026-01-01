@@ -1,10 +1,8 @@
 #pragma once
 #include "ui/Page.h"
-
+class PageController;
 class PaintPage : public Page {
     public:
         void draw(Adafruit_ILI9341& tft) override;
-        PageID handleTouch(int x, int y) override;
-    private:
-        bool drawing = true;
+        PageID handleTouch(int x, int y, PageController& controller) override;
 };
