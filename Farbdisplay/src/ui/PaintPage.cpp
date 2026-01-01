@@ -11,7 +11,7 @@ static bool inRect(int x, int y, int w, int h, int tx, int ty) {
 #include <math.h> // für cos, sin, PI
 
 // Schnell und lückenfrei: Farb-Rad zeichnen
-void drawColorWheel(Adafruit_ILI9341& tft, int radX = 50, int radY = 50, int radR = 40)
+void drawColorWheel(Adafruit_ILI9341& tft, int radX = 50, int radY = 80, int radR = 40)
 {
     // Schleife über Winkel mit halbem Grad Schritt für dichte Darstellung
     for(float angle = 0; angle < 360; angle += 0.5) 
@@ -43,12 +43,14 @@ void PaintPage::draw(Adafruit_ILI9341& tft){
     tft.setTextColor(ILI9341_YELLOW);
     tft.setTextSize(1);
     tft.print("Zeichenflaeche");
-    drawColorWheel(tft);
+    
     // Back-Button
     tft.fillRoundRect(10, 190, 100, 40, 6, ILI9341_RED);
     tft.setCursor(30, 203);
     tft.setTextColor(ILI9341_WHITE);
     tft.print("Back");
+
+    drawColorWheel(tft);
 }
 
 PageID PaintPage::handleTouch(int x, int y) {
