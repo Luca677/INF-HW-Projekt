@@ -1,4 +1,4 @@
-#include "menu_bitmap.h"
+#include "Menu_Bitmap.h"
 
 // 'Main_Menu', 320x240px
 const uint16_t menuBitmap[MENU_W * MENU_H] PROGMEM = {
