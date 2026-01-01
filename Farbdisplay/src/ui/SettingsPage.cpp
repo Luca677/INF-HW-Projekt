@@ -12,6 +12,10 @@ void SettingsPage::draw(Adafruit_ILI9341& tft) {
     tft.setTextSize(2);
     tft.print("Settings");
 
+    tft.fillRoundRect(10, 50, 220 , 40, 6, ILI9341_NAVY);
+    tft.setCursor(20,60);
+    tft.setTextColor(ILI9341_WHITE);
+    tft.print("Irgendein Button");
     // Back-Button
     tft.fillRoundRect(10, 190, 100, 40, 6, ILI9341_RED);
     tft.setCursor(30, 203);

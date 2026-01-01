@@ -1,5 +1,4 @@
 #include "TouchManager.h"
-
 TouchManager::TouchManager(uint8_t cs, uint8_t irq)
     : _ts(cs, irq) {}
 
@@ -7,7 +6,6 @@ void TouchManager::begin() {
     _ts.begin();
     _ts.setRotation(3);
 }
-
 TouchPoint TouchManager::read() {
     if (!_ts.touched()) return {0, 0, false};
 
@@ -19,3 +17,4 @@ TouchPoint TouchManager::read() {
 
     return {x, y, true};
 }
+
