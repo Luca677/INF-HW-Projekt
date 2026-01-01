@@ -1,15 +1,21 @@
 #include "ui/PaintPage.h"
+#include <Adafruit_ILI9341.h>
 #include <math.h>
 #define BTN_W 60
 #define BTN_H 30
 
+
+//BUTTONS
+//1 Button 18-4 & 58-46
+//2 Button 60-4 & 98-46
+//3 Button 102-4 & 138-46
+//4 Button 142-4 & 178-46
+//5 Button 184-4 & 218-46
+//6 Button 226-4 & 248-46
+//7 Button 268-4 & 288-46
 static bool inRect(int x, int y, int w, int h, int tx, int ty) {
     return tx >= x && tx < x + w && ty >= y && ty < y + h;
 }
-
-#include <Adafruit_ILI9341.h>
-#include <math.h> // für cos, sin, PI
-
 // Schnell und lückenfrei: Farb-Rad zeichnen
 void drawColorWheel(Adafruit_ILI9341& tft, int radX = 50, int radY = 80, int radR = 40)
 {
@@ -34,6 +40,7 @@ void drawColorWheel(Adafruit_ILI9341& tft, int radX = 50, int radY = 80, int rad
             tft.drawPixel(px, py, tft.color565(red, green, blue));
         }
     }
+    tft.drawRect(10, 40, 80, 80, ILI9341_WHITE); // Außenrahmen
 }
 
 
@@ -56,6 +63,12 @@ void PaintPage::draw(Adafruit_ILI9341& tft){
 PageID PaintPage::handleTouch(int x, int y) {
     if (inRect(10, 190, 100, 40, x, y))
         return PageID::HOME;
-
+    if(drawing == true && inRect(10, 40, 80, 80 , x ,y))
+    {
+        drawing = false;
+        float dx = x -50;
+        float dy = y-80;
+        float angle = atan2(dy, dx); // Winkel in Radiant
+    }
     return PageID::PAINT;
 }
