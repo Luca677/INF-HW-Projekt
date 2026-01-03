@@ -1,10 +1,12 @@
 #pragma once
 #include "ui/Page.h"
+#include <vector>
 class PageController;
 class PaintPage : public Page {
     public:
         void draw(Adafruit_ILI9341& tft) override;
-        void drawFarbauswahl(Adafruit_ILI9341& tft);
+        void undo();
+        void redo();
         
         PageID handleTouch(
         int x,
@@ -32,4 +34,20 @@ class PaintPage : public Page {
         //Radiergummi Variablen
         bool eraserActive = false;
         bool eraserDown = false;
-};
+
+        // Undo/Redo Stacks
+        //Jeder gezeichnete Strich wird als Objekt gespeichert
+        struct Point {
+            int x;
+            int y;
+        };
+        
+        struct Stroke {
+            std::vector<Point> points;
+            uint16_t color;
+            uint8_t brushsize;
+        }; 
+        std::vector<Stroke> undoStack;
+        std::vector<Stroke> redoStack;
+        Stroke currentStroke;
+    };
