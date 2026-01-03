@@ -24,24 +24,37 @@ Adafruit_ILI9341* _tft;
 static bool inRect(int x, int y, int w, int h, int tx, int ty) {
     return tx >= x && tx < x + w && ty >= y && ty < y + h;
 }
+
 void PaintPage::setTft(Adafruit_ILI9341& tft){
     _tft = &tft;
 }
+
 void PaintPage::draw(Adafruit_ILI9341& tft){
     static bool first = true;
     if(first){
         tft.drawRGBBitmap(0, 0, paintBitmap, PAINT_W, PAINT_H); 
         first = false;
     }
-    if(penActive && penDown)
-    {
-        tft.fillCircle(lastX, lastY,r,ILI9341_BLACK);
-        lastX = curX;
-        lastY = curY;
-    }
+
+   if(penActive && penDown)
+   {
+    tft.fillCircle(lastX, lastY,brushsize,ILI9341_BLACK);
+    lastX = curX;  // Update lastX nach dem Zeichnen
+    lastY = curY;
+   }
+   if(eraserActive && eraserDown)
+   {
+    tft.fillCircle(lastX, lastY,brushsize,ILI9341_WHITE);
+    lastX = curX;  // Update lastX nach dem Zeichnen
+    lastY = curY;
+   }
 }
+
 void PaintPage::penUp(){
     penDown = false;
+}
+void PaintPage::eraserUp(){
+    eraserDown = false;
 }
 void PaintPage::drawFarbauswahl(Adafruit_ILI9341& tft){
    tft.drawRGBBitmap(18, 52, farbauswahlBitmap, FARBAUSWAHL_W, FARBAUSWAHL_H); 
@@ -60,6 +73,7 @@ PageID PaintPage::handleTouch(int x, int y, PageController& controller) {
         drawFarbauswahl(*_tft);
         /* return ... */
         penActive = true;
+        eraserActive = false;
         penDown = false;
         Serial.println("Stift aktiviert");
         return PageID::PAINT;
@@ -67,20 +81,34 @@ PageID PaintPage::handleTouch(int x, int y, PageController& controller) {
     // 2 Button Radiergummi (60-4) -> (98-46)
     if (inRect(60, 4, 38, 42, x, y)) { // Radiergummi
         /* return ... */;
+        eraserActive = true;
+        penActive = false;
+        eraserDown = false;
+        Serial.println("Radiergummi aktiviert");
+        return PageID::PAINT;
     }
     // 3 Button Groß (102-4) -> (138-46)    
     if (inRect(102, 4, 36, 42, x, y)) { // Groß
         /* return ... */;
+        brushsize = 6;
+        Serial.println("Pinselgröße Groß gewählt");
+        return PageID::PAINT;
     }
     // 4 Button Mittel (142-4) -> (178-46)
 
     if (inRect(142, 4, 36, 42, x, y)) { // Mittel
         /* return ... */;
+        brushsize = 4;
+        Serial.println("Pinselgröße Mittel gewählt");
+        return PageID::PAINT;
     }
     // 5 Button Klein (184-4) -> (218-46)
 
     if (inRect(184, 4, 34, 42, x, y)) { // Klein
         /* return ... */;
+        brushsize = 2;
+        Serial.println("Pinselgröße Klein gewählt");
+        return PageID::PAINT;
     }
     // 6 Button Undo (226-4) -> (248-46)
 
@@ -105,17 +133,37 @@ PageID PaintPage::handleTouch(int x, int y, PageController& controller) {
         /* return ... */;
         if(penActive)
         {
+            eraserActive = false;
             if(!penDown)
             {
                 penDown = true;
-                lastX = x;
-                lastY = y;
+                curX = x;
+                curY = y;
+                lastX = curX;
+                lastY = curY;
             }
             else{
                 curX = x;
                 curY = y;
             }
 
+        }
+        if(eraserActive)
+        {
+            penActive = false;
+            if(!eraserDown)
+            {
+                eraserDown = true;
+                curX = x;
+                curY = y;
+                lastX = curX;
+                lastY = curY;
+            }
+            else
+            {
+              curX = x;
+              curY = y;  
+            }
         }
     }
     // 10 Button Löschen (302-74) -> (318-208)
