@@ -4,12 +4,16 @@ void PageController::add(PageID id, Page* page) {
     _pages[id] = page;
 }
 
-void PageController::set(PageID id) {
-    _current = id;
-    Serial.print("SET PAGE: ");
-    Serial.println((int)id);
+void PageController::set(PageID id, Adafruit_ILI9341& tft) {
+    if (id == _current) return;
 
+    _pages[_current]->onLeave();   
+    _current = id;
+    _pages[_current]->onEnter();   
+
+    draw(tft);
 }
+
 
 void PageController::draw(Adafruit_ILI9341& tft) {
     _pages[_current]->draw(tft);
@@ -20,10 +24,11 @@ PageID PageController::getCurrentPage() const {
 }
 
 void PageController::touch(int x, int y, Adafruit_ILI9341& tft) {
-    PageID next = _pages[_current]->handleTouch(x, y, *this);
+    PageID next = _pages[_current]->handleTouch(x, y, tft, *this);
+
     if (next != _current) {
-        _current = next;
-        draw(tft);
+        set(next, tft);   // ⭐ wichtig
         delay(200);
     }
 }
+

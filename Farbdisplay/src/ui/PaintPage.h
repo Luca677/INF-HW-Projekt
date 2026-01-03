@@ -5,12 +5,23 @@ class PaintPage : public Page {
     public:
         void draw(Adafruit_ILI9341& tft) override;
         void drawFarbauswahl(Adafruit_ILI9341& tft);
-        void setTft(Adafruit_ILI9341& tft);
-        PageID handleTouch(int x, int y, PageController& controller) override;
+        
+        PageID handleTouch(
+        int x,
+        int y,
+        Adafruit_ILI9341& tft,
+        PageController& controller
+        ) override;
+
         void penUp();
         void eraserUp();
+        void onLeave() override;
+
     private:
-    //Stift aktivieren Variablen und Einstellungen
+        bool showFarbauswahl = false;
+        bool needsRedraw = true;
+    
+        //Stift aktivieren Variablen und Einstellungen
         bool penActive = false;
         bool penDown = false;
         int lastX = 0;

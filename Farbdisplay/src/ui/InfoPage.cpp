@@ -26,7 +26,7 @@ void InfoPage::draw(Adafruit_ILI9341& tft) {
     tft.print("Back");
 }
 
-PageID InfoPage::handleTouch(int x, int y, PageController& controller) {
+PageID InfoPage::handleTouch(int x, int y,Adafruit_ILI9341& tft, PageController& controller) {
     if (inRect(10, 190, 100, 40, x, y))
         return PageID::HOME;
 

@@ -11,7 +11,7 @@ void HomePage::draw(Adafruit_ILI9341& tft) {
     tft.drawRGBBitmap(0, 0, menuBitmap, MENU_W, MENU_H);
 }
 
-PageID HomePage::handleTouch(int x, int y, PageController& controller) {
+PageID HomePage::handleTouch(int x, int y,Adafruit_ILI9341& tft, PageController& controller) {
     Serial.println("HomePage::handleTouch");
     // Paint Button (0,62,160,62) -> y=62..126
     if (inRect(0, 62, BTN_W, BTN_H, x, y)) {

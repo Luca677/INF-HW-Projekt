@@ -19,35 +19,53 @@
 //9 ZeichenFläche 18-52 & 300-234 (y noch unten und oben erhöhen!)
 //10 Button Löschen 302-74 & 318 208 (y noch unten und oben erhöhen!)
 
-Adafruit_ILI9341* _tft;
+
 
 static bool inRect(int x, int y, int w, int h, int tx, int ty) {
     return tx >= x && tx < x + w && ty >= y && ty < y + h;
 }
 
-void PaintPage::setTft(Adafruit_ILI9341& tft){
-    _tft = &tft;
+
+
+void PaintPage::onLeave() {
+    penDown = false;
+    eraserDown = false;
+    penActive = false;
+    eraserActive = false;
+
+    showFarbauswahl = false;
+    needsRedraw = true;
+
+    Serial.println("PaintPage verlassen → Zustand zurückgesetzt");
 }
 
-void PaintPage::draw(Adafruit_ILI9341& tft){
-    static bool first = true;
-    if(first){
-        tft.drawRGBBitmap(0, 0, paintBitmap, PAINT_W, PAINT_H); 
-        first = false;
+
+void PaintPage::draw(Adafruit_ILI9341& tft) {
+    if (needsRedraw) {
+        tft.drawRGBBitmap(0, 0, paintBitmap, PAINT_W, PAINT_H);
+
+        if (showFarbauswahl) {
+            tft.drawRGBBitmap(18, 52,
+                              farbauswahlBitmap,
+                              FARBAUSWAHL_W,
+                              FARBAUSWAHL_H);
+        }
+
+        needsRedraw = false;
     }
 
-   if(penActive && penDown)
-   {
-    tft.fillCircle(lastX, lastY,brushsize,ILI9341_BLACK);
-    lastX = curX;  // Update lastX nach dem Zeichnen
-    lastY = curY;
-   }
-   if(eraserActive && eraserDown)
-   {
-    tft.fillCircle(lastX, lastY,brushsize,ILI9341_WHITE);
-    lastX = curX;  // Update lastX nach dem Zeichnen
-    lastY = curY;
-   }
+    // Live-Zeichnen
+    if (penActive && penDown) {
+        tft.fillCircle(lastX, lastY, brushsize, ILI9341_BLACK);
+        lastX = curX;
+        lastY = curY;
+    }
+
+    if (eraserActive && eraserDown) {
+        tft.fillCircle(lastX, lastY, brushsize, ILI9341_WHITE);
+        lastX = curX;
+        lastY = curY;
+    }
 }
 
 void PaintPage::penUp(){
@@ -56,26 +74,21 @@ void PaintPage::penUp(){
 void PaintPage::eraserUp(){
     eraserDown = false;
 }
-void PaintPage::drawFarbauswahl(Adafruit_ILI9341& tft){
-   tft.drawRGBBitmap(18, 52, farbauswahlBitmap, FARBAUSWAHL_W, FARBAUSWAHL_H); 
-}   
 // 1 Button Stift (18-4) -> (58-46)
-PageID PaintPage::handleTouch(int x, int y, PageController& controller) {
+PageID PaintPage::handleTouch(int x, int y,Adafruit_ILI9341& tft, PageController& controller) {
     Serial.print("PaintPage::handleTouch");
     Serial.print(x);
     Serial.print(" , ");
     Serial.println(y);
 
-    if (controller.getCurrentPage() != PageID::PAINT) {
-        return PageID::PAINT;
-    }
     if (inRect(18, 4, 40, 42, x, y)) { // Stift 
-        drawFarbauswahl(*_tft);
-        /* return ... */
         penActive = true;
         eraserActive = false;
         penDown = false;
-        Serial.println("Stift aktiviert");
+
+        showFarbauswahl = true;
+        needsRedraw = true;
+
         return PageID::PAINT;
     }
     // 2 Button Radiergummi (60-4) -> (98-46)
@@ -125,6 +138,7 @@ PageID PaintPage::handleTouch(int x, int y, PageController& controller) {
     if (inRect(0, 78, 14, 134, x, y)) { // Hauptmenü
         Serial.println("Hauptmenü gedrückt");
         return PageID::HOME;
+        onLeave();
     }
     // 9 ZeichenFläche (18-52) -> (300-234)
 
@@ -170,7 +184,7 @@ PageID PaintPage::handleTouch(int x, int y, PageController& controller) {
 
     // Hinweis: y oben/unten ggf. noch vergrößern
     if (inRect(302, 74, 16, 134, x, y)) { // Löschen
-        draw( *_tft );
+        needsRedraw = true;
     }
 
     return PageID::PAINT;
