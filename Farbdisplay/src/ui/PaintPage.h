@@ -1,5 +1,6 @@
 #pragma once
 #include "ui/Page.h"
+#include <vector>
 class PageController;
 
 enum class PaintOverlay {
@@ -11,6 +12,9 @@ class PaintPage : public Page {
     public:
         PageID handleColorPickerTouch(int x, int y);
         void draw(Adafruit_ILI9341& tft) override;
+        void undo();
+        void redo();
+        
         void onEnter() override;
 
         PageID handleTouch(
@@ -42,4 +46,20 @@ class PaintPage : public Page {
         bool eraserDown = false;
         uint16_t currentColor = ILI9341_BLACK;
 
-};
+
+        // Undo/Redo Stacks
+        //Jeder gezeichnete Strich wird als Objekt gespeichert
+        struct Point {
+            int x;
+            int y;
+        };
+        
+        struct Stroke {
+            std::vector<Point> points;
+            uint16_t color;
+            uint8_t brushsize;
+        }; 
+        std::vector<Stroke> undoStack;
+        std::vector<Stroke> redoStack;
+        Stroke currentStroke;
+    };
