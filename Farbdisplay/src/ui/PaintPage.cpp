@@ -110,7 +110,6 @@ void PaintPage::draw(Adafruit_ILI9341& tft) {
 // --------------------------------------------------
 // Touch-Hilfen
 // --------------------------------------------------
-void PaintPage::penUp() {
 
 void PaintPage::penUp() {
     if (penDown && !currentStroke.points.empty()) {
