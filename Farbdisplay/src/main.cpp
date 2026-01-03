@@ -27,6 +27,7 @@ void setup() {
 
     pages.set(PageID::HOME);
     pages.draw(display.tft());
+    paint.setTft(display.tft());
 }
 
 void loop() {

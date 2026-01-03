@@ -1,5 +1,5 @@
 #include "HomePage.h"
-#include "assets/menu_bitmap.h"
+#include "assets/Menu_Bitmap.h"
 #define BTN_W 158
 #define BTN_H 64
 

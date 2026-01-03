@@ -1,5 +1,6 @@
 #include "ui/PaintPage.h"
 #include "assets/Paint_Bitmap.h"
+#include "assets/Farbauswahl_Bitmap.h"
 #include "ui/PageController.h"
 #include <Adafruit_ILI9341.h>
 #include <math.h>
@@ -18,14 +19,20 @@
 //9 Button Fläche 18-52 & 300-234 (y noch unten und oben erhöhen!)
 //10 Button Löschen 302-74 & 318 208 (y noch unten und oben erhöhen!)
 
+Adafruit_ILI9341* _tft;
+
 static bool inRect(int x, int y, int w, int h, int tx, int ty) {
     return tx >= x && tx < x + w && ty >= y && ty < y + h;
 }
-
+void PaintPage::setTft(Adafruit_ILI9341& tft){
+    _tft = &tft;
+}
 void PaintPage::draw(Adafruit_ILI9341& tft){
    tft.drawRGBBitmap(0, 0, paintBitmap, PAINT_W, PAINT_H); 
 }
-
+void PaintPage::drawFarbauswahl(Adafruit_ILI9341& tft){
+   tft.drawRGBBitmap(18, 52, farbauswahlBitmap, FARBAUSWAHL_W, FARBAUSWAHL_H); 
+}   
 // 1 Button Stift (18-4) -> (58-46)
 PageID PaintPage::handleTouch(int x, int y, PageController& controller) {
     Serial.print("PaintPage::handleTouch");
@@ -37,7 +44,7 @@ PageID PaintPage::handleTouch(int x, int y, PageController& controller) {
         return PageID::PAINT;
     }
     if (inRect(18, 4, 40, 42, x, y)) { // Stift 
-        /* return ... */;
+        drawFarbauswahl(*_tft);
     }
     // 2 Button Radiergummi (60-4) -> (98-46)
     if (inRect(60, 4, 38, 42, x, y)) { // Radiergummi
@@ -83,7 +90,7 @@ PageID PaintPage::handleTouch(int x, int y, PageController& controller) {
 
     // Hinweis: y oben/unten ggf. noch vergrößern
     if (inRect(302, 74, 16, 134, x, y)) { // Löschen
-        /* return ... */;
+        draw( *_tft );
     }
 
     return PageID::PAINT;
