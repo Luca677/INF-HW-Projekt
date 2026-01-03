@@ -35,6 +35,7 @@ void loop() {
 
     if(!p.valid) {
         paint.penUp();
+        paint.eraserUp();
         return;
     }
 
