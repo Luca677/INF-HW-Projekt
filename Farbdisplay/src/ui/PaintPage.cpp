@@ -123,6 +123,8 @@ PageID PaintPage::handleTouch(int x, int y, PageController& controller) {
     // 8 Button Hauptmenü (0-78) -> (14-212)
 
     if (inRect(0, 78, 14, 134, x, y)) { // Hauptmenü
+        eraserActive = false;
+        penActive = false;
         Serial.println("Hauptmenü gedrückt");
         return PageID::HOME;
     }
