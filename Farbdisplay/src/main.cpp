@@ -32,12 +32,17 @@ void setup() {
 
 void loop() {
     auto p = touch.read();
-    if (!p.valid) return;
+
+    if(!p.valid) {
+        paint.penUp();
+        return;
+    }
 
     Serial.print("CURRENT PAGE: ");
     Serial.println((int)pages.getCurrentPage());
 
     pages.touch(p.x, p.y, display.tft());
+    pages.draw(display.tft());
 }
 
 //Pinbelegung TFT 2.8" ILI9341 mit Touch XPT2046 
