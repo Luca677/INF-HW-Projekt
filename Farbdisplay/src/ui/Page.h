@@ -1,7 +1,7 @@
 #pragma once
 #include <Adafruit_ILI9341.h>
 
-enum class PageID { HOME, SETTINGS, INFO, PAINT };
+enum class PageID { HOME, SETTINGS, INFO, PAINT, COUNT };
 class PageController;
 class Page {
 public:

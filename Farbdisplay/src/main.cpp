@@ -39,9 +39,6 @@ void loop() {
         return;
     }
 
-    Serial.print("CURRENT PAGE: ");
-    Serial.println((int)pages.getCurrentPage());
-
     pages.touch(p.x, p.y, display.tft());
     pages.draw(display.tft());
 }

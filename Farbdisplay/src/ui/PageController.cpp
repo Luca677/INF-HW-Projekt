@@ -14,21 +14,23 @@ void PageController::set(PageID id, Adafruit_ILI9341& tft) {
     draw(tft);
 }
 
+Page* PageController::get(PageID id) {
+    return _pages[id];
+}
 
 void PageController::draw(Adafruit_ILI9341& tft) {
     _pages[_current]->draw(tft);
 }
 
-PageID PageController::getCurrentPage() const {
-    return _current;
-}
-
 void PageController::touch(int x, int y, Adafruit_ILI9341& tft) {
+    if (_pages.find(_current) == _pages.end()) return; // 🛡️
+
     PageID next = _pages[_current]->handleTouch(x, y, tft, *this);
 
     if (next != _current) {
-        set(next, tft);   // ⭐ wichtig
+        set(next, tft);
         delay(200);
     }
 }
+
 

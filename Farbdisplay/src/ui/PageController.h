@@ -4,13 +4,16 @@
 
 class PageController {
 public:
+    PageController() : _current(PageID::HOME) {}   // ✅ WICHTIG
+
     void add(PageID id, Page* page);
     void set(PageID id, Adafruit_ILI9341& tft);
     void draw(Adafruit_ILI9341& tft);
     void touch(int x, int y, Adafruit_ILI9341& tft);
-    PageID getCurrentPage() const;
+    Page* get(PageID id);
+
 private:
     PageID _current;
     std::map<PageID, Page*> _pages;
-
 };
+

@@ -1,11 +1,18 @@
 #pragma once
 #include "ui/Page.h"
 class PageController;
+
+enum class PaintOverlay {
+    NONE,
+    COLOR_PICKER
+};
+
 class PaintPage : public Page {
     public:
+        PageID handleColorPickerTouch(int x, int y);
         void draw(Adafruit_ILI9341& tft) override;
-        void drawFarbauswahl(Adafruit_ILI9341& tft);
-        
+        void onEnter() override;
+
         PageID handleTouch(
         int x,
         int y,
@@ -16,11 +23,12 @@ class PaintPage : public Page {
         void penUp();
         void eraserUp();
         void onLeave() override;
+        void setColor(uint16_t c);
 
     private:
         bool showFarbauswahl = false;
         bool needsRedraw = true;
-    
+        PaintOverlay overlay = PaintOverlay::NONE;
         //Stift aktivieren Variablen und Einstellungen
         bool penActive = false;
         bool penDown = false;
@@ -32,4 +40,6 @@ class PaintPage : public Page {
         //Radiergummi Variablen
         bool eraserActive = false;
         bool eraserDown = false;
+        uint16_t currentColor = ILI9341_BLACK;
+
 };

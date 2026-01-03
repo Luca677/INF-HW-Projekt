@@ -3,60 +3,56 @@
 #include "assets/Farbauswahl_Bitmap.h"
 #include "ui/PageController.h"
 #include <Adafruit_ILI9341.h>
-#include <math.h>
-#define BTN_W 60
-#define BTN_H 30
 
-//BUTTONS
-//1 Button Stift 18-4 & 58-46
-//2 Button Radiergummi 60-4 & 98-46
-//3 Button Groß 102-4 & 138-46
-//4 Button Mittel 142-4 & 178-46
-//5 Button Klein 184-4 & 218-46
-//6 Button Undo 226-4 & 248-46
-//7 Button Redo 268-4 & 288-46
-//8 Button Hauptmenü 0-78 & 14-212
-//9 ZeichenFläche 18-52 & 300-234 (y noch unten und oben erhöhen!)
-//10 Button Löschen 302-74 & 318 208 (y noch unten und oben erhöhen!)
-
-
-
+// --------------------------------------------------
+// Hilfsfunktion
+// --------------------------------------------------
 static bool inRect(int x, int y, int w, int h, int tx, int ty) {
     return tx >= x && tx < x + w && ty >= y && ty < y + h;
 }
 
+// --------------------------------------------------
+// Lebenszyklus
+// --------------------------------------------------
 
+void PaintPage::onEnter() {
+    needsRedraw = true;
+}
 
 void PaintPage::onLeave() {
     penDown = false;
     eraserDown = false;
     penActive = false;
     eraserActive = false;
-
-    showFarbauswahl = false;
+    overlay = PaintOverlay::NONE;
     needsRedraw = true;
-
-    Serial.println("PaintPage verlassen → Zustand zurückgesetzt");
 }
 
-
+// --------------------------------------------------
+// Zeichnen
+// --------------------------------------------------
 void PaintPage::draw(Adafruit_ILI9341& tft) {
+
+    // 1️⃣ Basis-UI einmal neu zeichnen
     if (needsRedraw) {
         tft.drawRGBBitmap(0, 0, paintBitmap, PAINT_W, PAINT_H);
-
-        if (showFarbauswahl) {
-            tft.drawRGBBitmap(18, 52,
-                              farbauswahlBitmap,
-                              FARBAUSWAHL_W,
-                              FARBAUSWAHL_H);
-        }
-
         needsRedraw = false;
     }
 
-    // Live-Zeichnen
+    // 2️⃣ Overlay darüber (ohne Zeichenfläche zu löschen)
+    if (overlay == PaintOverlay::COLOR_PICKER) {
+        tft.drawRGBBitmap(
+            18, 52,
+            farbauswahlBitmap,
+            FARBAUSWAHL_W,
+            FARBAUSWAHL_H
+        );
+        return; // ⛔ darunter nichts verändern
+    }
+
+    // 3️⃣ Live-Zeichnen
     if (penActive && penDown) {
-        tft.fillCircle(lastX, lastY, brushsize, ILI9341_BLACK);
+        tft.fillCircle(lastX, lastY, brushsize, currentColor);
         lastX = curX;
         lastY = curY;
     }
@@ -68,124 +64,116 @@ void PaintPage::draw(Adafruit_ILI9341& tft) {
     }
 }
 
-void PaintPage::penUp(){
+
+// --------------------------------------------------
+// Touch-Hilfen
+// --------------------------------------------------
+void PaintPage::penUp() {
     penDown = false;
 }
-void PaintPage::eraserUp(){
+
+void PaintPage::eraserUp() {
     eraserDown = false;
 }
-// 1 Button Stift (18-4) -> (58-46)
-PageID PaintPage::handleTouch(int x, int y,Adafruit_ILI9341& tft, PageController& controller) {
-    Serial.print("PaintPage::handleTouch");
-    Serial.print(x);
-    Serial.print(" , ");
-    Serial.println(y);
 
-    if (inRect(18, 4, 40, 42, x, y)) { // Stift 
+// --------------------------------------------------
+// ColorPicker Touch
+// --------------------------------------------------
+PageID PaintPage::handleColorPickerTouch(int x, int y) {
+
+    static const uint16_t colors[7] = {
+        ILI9341_BLACK,
+        ILI9341_RED,
+        ILI9341_GREEN,
+        ILI9341_BLUE,
+        ILI9341_YELLOW,
+        ILI9341_MAGENTA,
+        ILI9341_CYAN
+    };
+
+    for (int i = 0; i < 7; i++) {
+        if (inRect(18 + i * 42, 52, 40, 42, x, y)) {
+            currentColor = colors[i];
+            overlay = PaintOverlay::NONE;   // ✅ Overlay schließen
+            needsRedraw = true;
+            return PageID::PAINT;
+        }
+    }
+
+    return PageID::PAINT;
+}
+
+// --------------------------------------------------
+// Touch-Handling
+// --------------------------------------------------
+PageID PaintPage::handleTouch(int x, int y,
+                              Adafruit_ILI9341& tft,
+                              PageController& controller) {
+
+    // 🎨 Overlay aktiv → NUR ColorPicker
+    if (overlay == PaintOverlay::COLOR_PICKER) {
+        return handleColorPickerTouch(x, y);
+    }
+
+    // 1️⃣ Stift
+    if (inRect(18, 4, 40, 42, x, y)) {
         penActive = true;
         eraserActive = false;
         penDown = false;
-
-        showFarbauswahl = true;
+        overlay = PaintOverlay::COLOR_PICKER;
         needsRedraw = true;
-
         return PageID::PAINT;
     }
-    // 2 Button Radiergummi (60-4) -> (98-46)
-    if (inRect(60, 4, 38, 42, x, y)) { // Radiergummi
-        /* return ... */;
+
+    // 2️⃣ Radierer
+    if (inRect(60, 4, 38, 42, x, y)) {
         eraserActive = true;
         penActive = false;
         eraserDown = false;
-        Serial.println("Radiergummi aktiviert");
         return PageID::PAINT;
     }
-    // 3 Button Groß (102-4) -> (138-46)    
-    if (inRect(102, 4, 36, 42, x, y)) { // Groß
-        /* return ... */;
-        brushsize = 6;
-        Serial.println("Pinselgröße Groß gewählt");
-        return PageID::PAINT;
-    }
-    // 4 Button Mittel (142-4) -> (178-46)
 
-    if (inRect(142, 4, 36, 42, x, y)) { // Mittel
-        /* return ... */;
-        brushsize = 4;
-        Serial.println("Pinselgröße Mittel gewählt");
-        return PageID::PAINT;
-    }
-    // 5 Button Klein (184-4) -> (218-46)
+    // 3️⃣–5️⃣ Pinselgrößen
+    if (inRect(102, 4, 36, 42, x, y)) { brushsize = 6; return PageID::PAINT; }
+    if (inRect(142, 4, 36, 42, x, y)) { brushsize = 4; return PageID::PAINT; }
+    if (inRect(184, 4, 34, 42, x, y)) { brushsize = 2; return PageID::PAINT; }
 
-    if (inRect(184, 4, 34, 42, x, y)) { // Klein
-        /* return ... */;
-        brushsize = 2;
-        Serial.println("Pinselgröße Klein gewählt");
-        return PageID::PAINT;
-    }
-    // 6 Button Undo (226-4) -> (248-46)
-
-    if (inRect(226, 4, 22, 42, x, y)) { // Undo
-        /* return ... */;
-    }
-    // 7 Button Redo (268-4) -> (288-46)
-
-    if (inRect(268, 4, 20, 42, x, y)) { // Redo
-        /* return ... */;
-    }
-    // 8 Button Hauptmenü (0-78) -> (14-212)
-
-    if (inRect(0, 78, 14, 134, x, y)) { // Hauptmenü
-        eraserActive = false;
-        penActive = false;
-        Serial.println("Hauptmenü gedrückt");
-        return PageID::HOME;
+    // 8️⃣ Hauptmenü
+    if (inRect(0, 78, 14, 134, x, y)) {
         onLeave();
+        return PageID::HOME;
     }
-    // 9 ZeichenFläche (18-52) -> (300-234)
 
-    // Hinweis: y oben/unten ggf. noch vergrößern
-    if (inRect(18, 52, 282, 182, x, y)) { // Fläche
-        /* return ... */;
-        if(penActive)
-        {
+    // 9️⃣ Zeichenfläche
+    if (inRect(18, 52, 282, 182, x, y)) {
+
+        if (penActive) {
             eraserActive = false;
-            if(!penDown)
-            {
+            if (!penDown) {
                 penDown = true;
-                curX = x;
-                curY = y;
-                lastX = curX;
-                lastY = curY;
-            }
-            else{
+                lastX = curX = x;
+                lastY = curY = y;
+            } else {
                 curX = x;
                 curY = y;
             }
-
         }
-        if(eraserActive)
-        {
+
+        if (eraserActive) {
             penActive = false;
-            if(!eraserDown)
-            {
+            if (!eraserDown) {
                 eraserDown = true;
+                lastX = curX = x;
+                lastY = curY = y;
+            } else {
                 curX = x;
                 curY = y;
-                lastX = curX;
-                lastY = curY;
-            }
-            else
-            {
-              curX = x;
-              curY = y;  
             }
         }
     }
-    // 10 Button Löschen (302-74) -> (318-208)
 
-    // Hinweis: y oben/unten ggf. noch vergrößern
-    if (inRect(302, 74, 16, 134, x, y)) { // Löschen
+    // 🔟 Löschen (nur UI neu zeichnen)
+    if (inRect(302, 74, 16, 134, x, y)) {
         needsRedraw = true;
     }
 
