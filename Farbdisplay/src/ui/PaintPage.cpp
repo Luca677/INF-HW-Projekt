@@ -30,15 +30,15 @@ void PaintPage::setTft(Adafruit_ILI9341& tft){
 void PaintPage::draw(Adafruit_ILI9341& tft){
     static bool first = true;
     if(first){
-    tft.drawRGBBitmap(0, 0, paintBitmap, PAINT_W, PAINT_H); 
+        tft.drawRGBBitmap(0, 0, paintBitmap, PAINT_W, PAINT_H); 
         first = false;
     }
-   if(penActive && penDown)
-   {
-    tft.fillCircle(lastX, lastY,r,ILI9341_BLACK);
-    lastX = curX;
-    lastY = curY;
-   }
+    if(penActive && penDown)
+    {
+        tft.fillCircle(lastX, lastY,r,ILI9341_BLACK);
+        lastX = curX;
+        lastY = curY;
+    }
 }
 void PaintPage::penUp(){
     penDown = false;
