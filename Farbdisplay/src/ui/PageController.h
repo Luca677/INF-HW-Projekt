@@ -13,7 +13,7 @@ public:
     Page* get(PageID id);
     PageID getCurrent() const { return _current; }
 private:
-    PageID _current;
+    PageID _current = PageID::HOME;
     std::map<PageID, Page*> _pages;
 };
 
