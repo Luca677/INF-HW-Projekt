@@ -209,7 +209,7 @@ PageID PaintPage::handleTouch(int x, int y,
     }
 
     // Zeichenfläche
-    if (inRect(18, 52, 282, 182, x, y)) {
+    if (inRect(24, 58, 272, 172, x, y)) {
         if (!(penDown || eraserDown)) {
             currentStroke.points.clear();
             currentStroke.color = penActive ? currentColor : ILI9341_WHITE;
