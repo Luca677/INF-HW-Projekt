@@ -30,6 +30,11 @@ void InfoPage::draw(Adafruit_ILI9341& tft) {
     tft.setCursor(10, 80);
     tft.print("2025/26");
 
+    tft.setCursor(10, 110);
+    tft.print("Zeilen Code: ~800");
+    tft.setCursor(10, 125);
+    tft.print("Bitmaps: ~ 10500 Zeilen");
+
     tft.fillRoundRect(10, 190, 100, 40, 6, ILI9341_RED);
     tft.setCursor(30, 203);
     tft.setTextSize(2);
