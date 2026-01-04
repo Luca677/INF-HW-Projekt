@@ -22,7 +22,7 @@ void SettingsPage::draw(Adafruit_ILI9341& tft) {
 
     tft.fillRoundRect(10, 50, 220 , 40, 6, ILI9341_NAVY);
     tft.setCursor(20,60);
-    tft.print("Irgendein Button");
+    tft.print("Work in Progress");
 
     tft.fillRoundRect(10, 190, 100, 40, 6, ILI9341_RED);
     tft.setCursor(30, 203);

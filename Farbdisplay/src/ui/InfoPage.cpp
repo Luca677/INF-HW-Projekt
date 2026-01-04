@@ -22,10 +22,13 @@ void InfoPage::draw(Adafruit_ILI9341& tft) {
 
     tft.setTextSize(1);
     tft.setCursor(10, 50);
-    tft.print("STM32 Nucleo L152RE");
+    tft.print("Paint Programm auf ILI9341 Display");
 
     tft.setCursor(10, 65);
-    tft.print("Touch + TFT Demo");
+    tft.print("Winterprojekt von Luca Schreger und Henrik Wuertz");
+
+    tft.setCursor(10, 80);
+    tft.print("2025/26");
 
     tft.fillRoundRect(10, 190, 100, 40, 6, ILI9341_RED);
     tft.setCursor(30, 203);
