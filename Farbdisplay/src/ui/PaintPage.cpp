@@ -3,6 +3,7 @@
 #include "assets/Farbauswahl_Bitmap.h"
 #include "ui/PageController.h"
 #include <Adafruit_ILI9341.h>
+#include <algorithm>
 
 // --------------------------------------------------
 // Hilfsfunktion
@@ -12,9 +13,8 @@ static bool inRect(int x, int y, int w, int h, int tx, int ty) {
 }
 
 // --------------------------------------------------
-// Lebenszyklus
+// Lifecycle
 // --------------------------------------------------
-
 void PaintPage::onEnter() {
     needsRedraw = true;
 }
@@ -29,26 +29,24 @@ void PaintPage::onLeave() {
 }
 
 // --------------------------------------------------
-// Zeichnen
+// Drawing
 // --------------------------------------------------
 void PaintPage::draw(Adafruit_ILI9341& tft) {
 
-    // 1️⃣ Basis-UI einmal neu zeichnen
+    // 1️⃣ UI + alle gespeicherten Striche
     if (needsRedraw) {
-        // Hintergrundbitmap
         tft.drawRGBBitmap(0, 0, paintBitmap, PAINT_W, PAINT_H);
 
-        // Alle Striche aus UndoStack zeichnen
         for (const auto& stroke : undoStack) {
             for (size_t i = 1; i < stroke.points.size(); i++) {
-                int x0 = stroke.points[i-1].x;
-                int y0 = stroke.points[i-1].y;
+                int x0 = stroke.points[i - 1].x;
+                int y0 = stroke.points[i - 1].y;
                 int x1 = stroke.points[i].x;
                 int y1 = stroke.points[i].y;
 
                 int dx = x1 - x0;
                 int dy = y1 - y0;
-                int steps = max(abs(dx), abs(dy));
+                int steps = std::max(abs(dx), abs(dy));
 
                 for (int s = 0; s <= steps; s++) {
                     int px = x0 + dx * s / steps;
@@ -58,15 +56,10 @@ void PaintPage::draw(Adafruit_ILI9341& tft) {
             }
         }
 
-        // Farbauswahl
-        if (showFarbauswahl) {
-            tft.drawRGBBitmap(18, 52, farbauswahlBitmap, FARBAUSWAHL_W, FARBAUSWAHL_H);
-        }
-
         needsRedraw = false;
     }
 
-    // 2️⃣ Overlay darüber (ohne Zeichenfläche zu löschen)
+    // 2️⃣ ColorPicker Overlay
     if (overlay == PaintOverlay::COLOR_PICKER) {
         tft.drawRGBBitmap(
             18, 52,
@@ -74,25 +67,16 @@ void PaintPage::draw(Adafruit_ILI9341& tft) {
             FARBAUSWAHL_W,
             FARBAUSWAHL_H
         );
-        return; // ⛔ darunter nichts verändern
+        return;
     }
 
     // 3️⃣ Live-Zeichnen
-    if (penActive && penDown) {
-        tft.fillCircle(lastX, lastY, brushsize, currentColor);
-        lastX = curX;
-        lastY = curY;
-    }
-
-    if (eraserActive && eraserDown) {
-        tft.fillCircle(lastX, lastY, brushsize, ILI9341_WHITE);
-    // Live-Zeichnen während Touch
     if (penDown || eraserDown) {
-        uint16_t color = penActive ? ILI9341_BLACK : ILI9341_WHITE;
+        uint16_t color = penActive ? currentColor : ILI9341_WHITE;
 
         int dx = curX - lastX;
         int dy = curY - lastY;
-        int steps = max(abs(dx), abs(dy));
+        int steps = std::max(abs(dx), abs(dy));
 
         for (int s = 0; s <= steps; s++) {
             int px = lastX + dx * s / steps;
@@ -106,11 +90,9 @@ void PaintPage::draw(Adafruit_ILI9341& tft) {
     }
 }
 
-
 // --------------------------------------------------
-// Touch-Hilfen
+// Touch helpers
 // --------------------------------------------------
-
 void PaintPage::penUp() {
     if (penDown && !currentStroke.points.empty()) {
         undoStack.push_back(currentStroke);
@@ -129,33 +111,27 @@ void PaintPage::eraserUp() {
     eraserDown = false;
 }
 
+// --------------------------------------------------
+// Undo / Redo
+// --------------------------------------------------
 void PaintPage::undo() {
     if (undoStack.empty()) return;
-
     redoStack.push_back(undoStack.back());
     undoStack.pop_back();
-
-    penDown = false;
-    eraserDown = false;
     needsRedraw = true;
 }
 
 void PaintPage::redo() {
     if (redoStack.empty()) return;
-
     undoStack.push_back(redoStack.back());
     redoStack.pop_back();
-
-    penDown = false;
-    eraserDown = false;
     needsRedraw = true;
 }
 
 // --------------------------------------------------
-// ColorPicker Touch
+// ColorPicker
 // --------------------------------------------------
 PageID PaintPage::handleColorPickerTouch(int x, int y) {
-
     static const uint16_t colors[7] = {
         ILI9341_BLACK,
         ILI9341_RED,
@@ -169,93 +145,87 @@ PageID PaintPage::handleColorPickerTouch(int x, int y) {
     for (int i = 0; i < 7; i++) {
         if (inRect(18 + i * 42, 52, 40, 42, x, y)) {
             currentColor = colors[i];
-            overlay = PaintOverlay::NONE;   // ✅ Overlay schließen
+            overlay = PaintOverlay::NONE;
+            penDown = false;
+            eraserDown = false;
             needsRedraw = true;
             return PageID::PAINT;
         }
     }
-
     return PageID::PAINT;
 }
 
 // --------------------------------------------------
-// Touch-Handling
+// Touch handling
 // --------------------------------------------------
 PageID PaintPage::handleTouch(int x, int y,
                               Adafruit_ILI9341& tft,
                               PageController& controller) {
 
-    // 🎨 Overlay aktiv → NUR ColorPicker
+    // Overlay aktiv
     if (overlay == PaintOverlay::COLOR_PICKER) {
         return handleColorPickerTouch(x, y);
     }
 
-    // 1️⃣ Stift
+    // Stift
     if (inRect(18, 4, 40, 42, x, y)) {
         penActive = true;
         eraserActive = false;
-        penDown = false;
         overlay = PaintOverlay::COLOR_PICKER;
-        needsRedraw = true;
         return PageID::PAINT;
     }
 
-    // 2️⃣ Radierer
+    // Radierer
     if (inRect(60, 4, 38, 42, x, y)) {
         eraserActive = true;
         penActive = false;
-        eraserDown = false;
         return PageID::PAINT;
     }
 
-    // 3️⃣–5️⃣ Pinselgrößen
+    // Brushsize
     if (inRect(102, 4, 36, 42, x, y)) { brushsize = 6; return PageID::PAINT; }
     if (inRect(142, 4, 36, 42, x, y)) { brushsize = 4; return PageID::PAINT; }
     if (inRect(184, 4, 34, 42, x, y)) { brushsize = 2; return PageID::PAINT; }
 
-    // 8️⃣ Hauptmenü
+    // Undo / Redo
+    if (inRect(226, 4, 22, 42, x, y)) { undo(); return PageID::PAINT; }
+    if (inRect(268, 4, 20, 42, x, y)) { redo(); return PageID::PAINT; }
+
+    // 🧹 LÖSCHEN (NEU & FINAL)
+    if (inRect(302, 74, 16, 134, x, y)) {
+        undoStack.clear();
+        redoStack.clear();
+        currentStroke.points.clear();
+        penDown = false;
+        eraserDown = false;
+        needsRedraw = true;
+        return PageID::PAINT;
+    }
+
+    // Hauptmenü
     if (inRect(0, 78, 14, 134, x, y)) {
         onLeave();
         return PageID::HOME;
     }
-    // 9 ZeichenFläche (18-52) -> (300-234)
 
-    // Hinweis: y oben/unten ggf. noch vergrößern
-    if (inRect(18, 52, 282, 182, x, y)) { // Fläche
-        /* return ... */;
-        if (penActive || eraserActive) {
-            if (!(penDown || eraserDown)) {
-                currentStroke.points.clear();
-                currentStroke.color = penActive ? ILI9341_BLACK : ILI9341_WHITE;
-                currentStroke.brushsize = brushsize;
-        
-                penDown = penActive;
-                eraserDown = eraserActive;
-        
-                curX = x;
-                curY = y;
-                lastX = x;
-                lastY = y;
-        
-                currentStroke.points.push_back({x, y});
-            } else {
-                curX = x;
-                curY = y;
-            }
+    // Zeichenfläche
+    if (inRect(18, 52, 282, 182, x, y)) {
+        if (!(penDown || eraserDown)) {
+            currentStroke.points.clear();
+            currentStroke.color = penActive ? currentColor : ILI9341_WHITE;
+            currentStroke.brushsize = brushsize;
+
+            penDown = penActive;
+            eraserDown = eraserActive;
+
+            lastX = curX = x;
+            lastY = curY = y;
+
+            currentStroke.points.push_back({x, y});
+        } else {
+            curX = x;
+            curY = y;
         }
-
-        
-    }
-    return PageID::PAINT;
-    
-
-    // 10 Button Löschen (302-74) -> (318-208)
-
-    // Hinweis: y oben/unten ggf. noch vergrößern
-    if (inRect(302, 74, 16, 134, x, y)) { // Löschen
-        undoStack.clear();
-        redoStack.clear();
-        needsRedraw = true;
     }
 
     return PageID::PAINT;

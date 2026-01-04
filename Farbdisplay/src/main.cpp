@@ -17,6 +17,7 @@ PaintPage paint;
 
 void setup() {
     Serial.begin(115200);
+
     display.begin();
     touch.begin();
 
@@ -25,36 +26,27 @@ void setup() {
     pages.add(PageID::INFO, &info);
     pages.add(PageID::PAINT, &paint);
 
-    pages.set(PageID::HOME,display.tft());
+    pages.set(PageID::HOME, display.tft());
     pages.draw(display.tft());
-    
 }
 
 void loop() {
     auto p = touch.read();
 
-    if(!p.valid) {
-        paint.penUp();
-        paint.eraserUp();
+    // 👉 KEIN Touch
+    if (!p.valid) {
+        // ❗ Stift/Radierer nur loslassen,
+        // ❗ wenn PaintPage wirklich aktiv ist
+        if (pages.getCurrent() == PageID::PAINT) {
+            paint.penUp();
+            paint.eraserUp();
+        }
         return;
     }
 
+    // 👉 Touch an aktive Page weiterreichen
     pages.touch(p.x, p.y, display.tft());
+
+    // 👉 Zeichnen der aktuellen Page
     pages.draw(display.tft());
 }
-
-//Pinbelegung TFT 2.8" ILI9341 mit Touch XPT2046 
-// 1 3.3V 
-// 2 GND 
-// 3 TFT_CS PB6 
-// 4 TFT_Reset PB8 
-// 5 TFT_DC PB7 
-// 6 MOSI PA7 
-// 7 SCK PA5 
-// 8 LED 3.3V 
-// 9 MISO PA6 
-// 10 T_CLK PA5 
-// 11 T_CS PB12 
-// 12 T_DIN PA7 
-// 13 T_DO PA6 
-// 14 T_IRQ PA0

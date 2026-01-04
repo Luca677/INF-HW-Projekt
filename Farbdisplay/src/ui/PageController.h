@@ -11,7 +11,7 @@ public:
     void draw(Adafruit_ILI9341& tft);
     void touch(int x, int y, Adafruit_ILI9341& tft);
     Page* get(PageID id);
-
+    PageID getCurrent() const { return _current; }
 private:
     PageID _current;
     std::map<PageID, Page*> _pages;
