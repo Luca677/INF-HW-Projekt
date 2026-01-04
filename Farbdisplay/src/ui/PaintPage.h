@@ -2,13 +2,25 @@
 #include "ui/Page.h"
 #include <vector>
 
-class PageController;
-
+/*
+ * PaintOverlay
+ * ------------
+ * Zustand der PaintPage-Oberfläche.
+ * Wird verwendet, um Overlays sauber vom Zeichenbereich zu trennen.
+ */
 enum class PaintOverlay {
     NONE,
     COLOR_PICKER
 };
 
+/*
+ * PaintPage
+ * ---------
+ * Konkrete Implementierung einer Page.
+ *
+ * Vererbt von Page und überschreibt draw(), handleTouch(),
+ * onEnter() und onLeave().
+ */
 class PaintPage : public Page {
 public:
     void draw(Adafruit_ILI9341& tft) override;
@@ -22,31 +34,35 @@ public:
     void onEnter() override;
     void onLeave() override;
 
-    void penUp();
-    void eraserUp();
     void undo();
     void redo();
 
+    void penUp();
+    void eraserUp();
+
 private:
-    // UI / State
+    // ---------------- Zustandsverwaltung ----------------
     bool needsRedraw = true;
     PaintOverlay overlay = PaintOverlay::NONE;
 
-    // Tool state
+    // ---------------- Werkzeug-Zustand ----------------
     bool penActive = false;
     bool penDown = false;
     bool eraserActive = false;
     bool eraserDown = false;
 
-    int lastX = 0;
-    int lastY = 0;
-    int curX  = 0;
-    int curY  = 0;
+    int lastX = 0, lastY = 0;
+    int curX = 0, curY = 0;
 
     int brushsize = 3;
     uint16_t currentColor = ILI9341_BLACK;
 
-    // ---------- Stroke Daten ----------
+    // ---------------- Undo / Redo ----------------
+    /*
+     * Jeder Strich wird als Objekt gespeichert.
+     * Das ist echtes objektorientiertes Denken:
+     * Ein Strich ist ein eigenes Datenobjekt.
+     */
     struct Point {
         int x;
         int y;
@@ -55,12 +71,13 @@ private:
     struct Stroke {
         std::vector<Point> points;
         uint16_t color;
-        uint8_t brushsize;   // ✅ FEHLENDES FELD
+        uint8_t brushsize;
     };
 
     std::vector<Stroke> undoStack;
     std::vector<Stroke> redoStack;
     Stroke currentStroke;
 
+    // Interne Hilfsfunktion
     PageID handleColorPickerTouch(int x, int y);
 };

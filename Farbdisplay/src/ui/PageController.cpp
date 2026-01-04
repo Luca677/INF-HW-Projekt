@@ -5,13 +5,21 @@ void PageController::add(PageID id, Page* page) {
 }
 
 void PageController::set(PageID id, Adafruit_ILI9341& tft) {
-    if (id == _current) return;
+    if (id == _current)
+        return;
 
+    // Alte Seite verlassen
     _pages[_current]->onLeave();
+
+    // Neue Seite aktivieren
     _current = id;
     _pages[_current]->onEnter();
 
-    draw(tft);   // ✅ EINZIGER Ort für draw()
+    draw(tft);
+}
+
+Page* PageController::get(PageID id) {
+    return _pages[id];
 }
 
 void PageController::draw(Adafruit_ILI9341& tft) {
@@ -19,13 +27,13 @@ void PageController::draw(Adafruit_ILI9341& tft) {
 }
 
 void PageController::touch(int x, int y, Adafruit_ILI9341& tft) {
+    if (_pages.find(_current) == _pages.end())
+        return;
+
     PageID next = _pages[_current]->handleTouch(x, y, tft, *this);
+
     if (next != _current) {
         set(next, tft);
-        delay(200);
+        delay(200); // Entprellung
     }
-}
-
-Page* PageController::get(PageID id) {
-    return _pages[id];
 }
