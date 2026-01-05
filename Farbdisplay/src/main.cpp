@@ -6,12 +6,7 @@
 #include "ui/InfoPage.h"
 #include "ui/PaintPage.h"
 
-/*
- * Globale Objekte
- * ----------------
- * Diese Objekte existieren während der gesamten Laufzeit des Programms.
- * Sie repräsentieren die zentralen Systemkomponenten.
- */
+//GLOBALE OBJEKTE
 
 // Kapselt das TFT-Display (Hardware-Abstraktion)
 DisplayManager display(PB6, PB7, PB8);
@@ -35,18 +30,13 @@ void setup() {
     display.begin();
     touch.begin();
 
-    /*
-     * Registrierung der Seiten beim PageController
-     * ---------------------------------------------
-     * Der PageController speichert nur Zeiger auf Page-Objekte.
-     * Dadurch kann er polymorph arbeiten (virtuelle Funktionen).
-     */
+    // Seiten registrieren beim PageController
     pages.add(PageID::HOME, &home);
     pages.add(PageID::SETTINGS, &settings);
     pages.add(PageID::INFO, &info);
     pages.add(PageID::PAINT, &paint);
 
-    // Startseite setzen
+    // Home-Seite als Startseite setzen 
     pages.set(PageID::HOME, display.tft());
     pages.draw(display.tft());
 }

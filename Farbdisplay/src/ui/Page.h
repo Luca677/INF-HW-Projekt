@@ -1,28 +1,24 @@
 #pragma once
 #include <Adafruit_ILI9341.h>
 
-/*
-    Jede Seite der Anwendung bekommt eine eindeutige ID.
-*/
+
+//Jede Seite der Anwendung bekommt eine eindeutige ID.
 enum class PageID {
     HOME,
     SETTINGS,
     INFO,
     PAINT,
-    COUNT
+    COUNT // Anzahl der Seiten (keine Seiten-ID)
 };
 
 class PageController;
 
-/*
-    Abstrakte Basisklasse "Page"
 
-    - Definiert das gemeinsame Interface aller Seiten
-    - Erzwingt konsistentes Verhalten
-*/
+//Abstrakte Oberklasse "Page"
 class Page {
 public:
-    virtual ~Page() = default;
+    //Jede Klasse MUSS einen Destruktor haben
+    virtual ~Page() = default; 
 
     // Jede Seite MUSS zeichnen können
     virtual void draw(Adafruit_ILI9341& tft) = 0;

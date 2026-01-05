@@ -1,28 +1,14 @@
 #pragma once
 #include <XPT2046_Touchscreen.h>
 
-/*
-    TouchPoint ist ein einfaches Datenobjekt (Plain Old Data).
-
-    Es enthält:
-    - Koordinaten
-    - ein Flag, ob der Touch gültig ist
-*/
+// TouchPoint als einfache Datenklasse
 struct TouchPoint {
     int x;
     int y;
     bool valid;
 };
 
-/*
-    TouchManager kapselt den Touchscreen.
-
-    Vorteil:
-    - Kalibrierung
-    - Rohdaten
-    - Mapping auf Displayauflösung
-    sind vollständig ausgelagert
-*/
+// TouchManager kapselt das XPT2046_Touchscreen Objekt
 class TouchManager {
 public:
     TouchManager(uint8_t cs, uint8_t irq);
@@ -33,7 +19,7 @@ public:
 private:
     XPT2046_Touchscreen _ts;
 
-    // Kalibrierungswerte
+    // Analoge Extremwerte des Touchscreens
     int _xMin = 200;
     int _xMax = 3800;
     int _yMin = 200;
