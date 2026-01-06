@@ -1,5 +1,6 @@
 #include "DisplayManager.h"
 
+
 DisplayManager::DisplayManager(uint8_t cs, uint8_t dc, uint8_t rst)
     : _tft(cs, dc, rst) {
 }
@@ -10,7 +11,7 @@ void DisplayManager::begin() {
     // Maximale stabile SPI-Geschwindigkeit
     _tft.setSPISpeed(40000000);
 
-    // Landscape-Modus
+    // Ausrichtung auf Querformat setzen
     _tft.setRotation(1);
 }
 
