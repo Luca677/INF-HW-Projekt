@@ -58,6 +58,6 @@ void loop() {
     // Touch an aktuelle Seite weiterleiten
     pages.touch(p.x, p.y, display.tft());
 
-    // Seite neu zeichnen (falls nötig)
+    // Seite neu zeichnen
     pages.draw(display.tft());
 }
