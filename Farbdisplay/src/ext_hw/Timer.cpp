@@ -5,12 +5,11 @@ HardwareTimer* timer = nullptr;
 
 // Timer Interrupt Service Routine
 void timerIsr() {
-    digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
+    digitalWrite(PA1, HIGH);
 }
 
 void timerInit() {
-    pinMode(LED_BUILTIN, OUTPUT);
-
+    pinMode(PA1, OUTPUT);
     // TIM2 HardwareTimer Objekt erstellen
     timer = new HardwareTimer(TIM2);
 
