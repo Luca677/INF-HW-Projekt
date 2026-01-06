@@ -6,12 +6,12 @@
 #include "ui/InfoPage.h"
 #include "ui/PaintPage.h"
 
-//GLOBALE OBJEKTE
+// GLOBALE OBJEKTE
 
-// Kapselt das TFT-Display (Hardware-Abstraktion)
+// Kapselt das TFT-Display
 DisplayManager display(PB6, PB7, PB8);
 
-// Kapselt den Touchscreen (Hardware-Abstraktion)
+// Kapselt den Touchscreen
 TouchManager touch(PB12, PA0);
 
 // Verwaltet alle Seiten (Pages) und den Seitenwechsel
@@ -47,11 +47,7 @@ void loop() {
 
     // Kein Touch erkannt
     if (!p.valid) {
-        /*
-         * Sonderfall PaintPage:
-         * Wenn der Finger losgelassen wird, muss ein aktiver Strich
-         * sauber abgeschlossen werden (Undo/Redo funktioniert sonst nicht).
-         */
+        // Werkzeuge zurücksetzen, falls auf Paint-Seite
         if (pages.getCurrent() == PageID::PAINT) {
             paint.penUp();
             paint.eraserUp();
