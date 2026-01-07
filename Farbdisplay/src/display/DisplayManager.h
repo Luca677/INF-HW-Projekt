@@ -1,15 +1,10 @@
 #pragma once
 #include <Adafruit_ILI9341.h>
 
-/*
-    DisplayManager kapselt das TFT-Display.
-
-    Vorteil:
-    - main.cpp kennt keine Display-Details
-    - Hardware-Zugriffe sind an einer Stelle gebündelt
-*/
+//DisplayManager kapselt das TFT-Display --> Schnittstelle
 class DisplayManager {
 public:
+    // Konstruktor mit Pin-Parametern
     DisplayManager(uint8_t cs, uint8_t dc, uint8_t rst);
 
     // Initialisiert das Display
