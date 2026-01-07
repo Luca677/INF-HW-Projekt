@@ -54,7 +54,7 @@ void loop() {
         }
         return;
     }
-
+    
     // Touch an aktuelle Seite weiterleiten
     pages.touch(p.x, p.y, display.tft());
 

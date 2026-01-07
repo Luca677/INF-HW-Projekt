@@ -16,6 +16,7 @@ PageID HomePage::handleTouch(int x, int y,Adafruit_ILI9341& tft, PageController&
     // Paint Button (0,62,160,62) -> y=62..126
     if (inRect(0, 62, BTN_W, BTN_H, x, y)) {
         return PageID::PAINT;
+        Serial.println("Switching to Paint Page");
     }
     // Settings Button (70,50,180,50) -> y=50..100
     if (inRect(160, 100, BTN_W, BTN_H, x, y))

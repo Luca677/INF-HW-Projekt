@@ -17,6 +17,7 @@ static bool inRect(int x, int y, int w, int h, int tx, int ty) {
 // --------------------------------------------------
 void PaintPage::onEnter() {
     needsRedraw = true;
+    Serial.println("Entering PaintPage");
 }
 
 void PaintPage::onLeave() {
@@ -26,6 +27,7 @@ void PaintPage::onLeave() {
     eraserActive = false;
     overlay = PaintOverlay::NONE;
     needsRedraw = true;
+    Serial.println("Leaving PaintPage");
 }
 
 // --------------------------------------------------
@@ -67,6 +69,7 @@ void PaintPage::draw(Adafruit_ILI9341& tft) {
             FARBAUSWAHL_W,
             FARBAUSWAHL_H
         );
+        Serial.println("Drawing Color Picker Overlay");
         return;
     }
 
@@ -85,6 +88,8 @@ void PaintPage::draw(Adafruit_ILI9341& tft) {
             currentStroke.points.push_back({px, py});
         }
 
+        Serial.println("Drawing Live Stroke");
+
         lastX = curX;
         lastY = curY;
     }
@@ -100,6 +105,7 @@ void PaintPage::penUp() {
         currentStroke.points.clear();
     }
     penDown = false;
+    Serial.println("Pen Up");
 }
 
 void PaintPage::eraserUp() {
@@ -109,6 +115,7 @@ void PaintPage::eraserUp() {
         currentStroke.points.clear();
     }
     eraserDown = false;
+    Serial.println("Eraser Up");
 }
 
 // --------------------------------------------------
@@ -119,6 +126,7 @@ void PaintPage::undo() {
     redoStack.push_back(undoStack.back());
     undoStack.pop_back();
     needsRedraw = true;
+    Serial.println("Undo Action");
 }
 
 void PaintPage::redo() {
@@ -126,6 +134,7 @@ void PaintPage::redo() {
     undoStack.push_back(redoStack.back());
     redoStack.pop_back();
     needsRedraw = true;
+    Serial.println("Redo Action");
 }
 
 // --------------------------------------------------
@@ -150,8 +159,10 @@ PageID PaintPage::handleColorPickerTouch(int x, int y) {
             eraserDown = false;
             needsRedraw = true;
             return PageID::PAINT;
+            Serial.print("Selected Color: " + String(colors[i]));
         }
     }
+    Serial.println("Color Picker Touch Outside");
     return PageID::PAINT;
 }
 
@@ -165,6 +176,7 @@ PageID PaintPage::handleTouch(int x, int y,
     // Overlay aktiv
     if (overlay == PaintOverlay::COLOR_PICKER) {
         return handleColorPickerTouch(x, y);
+        Serial.println("Handling Color Picker Touch");
     }
 
     // Stift
@@ -173,6 +185,7 @@ PageID PaintPage::handleTouch(int x, int y,
         eraserActive = false;
         overlay = PaintOverlay::COLOR_PICKER;
         return PageID::PAINT;
+        Serial.println("Activating Color Picker Overlay");
     }
 
     // Radierer
@@ -180,18 +193,19 @@ PageID PaintPage::handleTouch(int x, int y,
         eraserActive = true;
         penActive = false;
         return PageID::PAINT;
+        Serial.println("Eraser Activated");
     }
 
     // Brushsize
-    if (inRect(102, 4, 36, 42, x, y)) { brushsize = 6; return PageID::PAINT; }
-    if (inRect(142, 4, 36, 42, x, y)) { brushsize = 4; return PageID::PAINT; }
-    if (inRect(184, 4, 34, 42, x, y)) { brushsize = 2; return PageID::PAINT; }
+    if (inRect(102, 4, 36, 42, x, y)) { brushsize = 6; return PageID::PAINT; Serial.println("Brushsize set to 6"); }
+    if (inRect(142, 4, 36, 42, x, y)) { brushsize = 4; return PageID::PAINT; Serial.println("Brushsize set to 4");}
+    if (inRect(184, 4, 34, 42, x, y)) { brushsize = 2; return PageID::PAINT; Serial.println("Brushsize set to 2");}
 
     // Undo / Redo
     if (inRect(226, 4, 22, 42, x, y)) { undo(); return PageID::PAINT; }
     if (inRect(268, 4, 20, 42, x, y)) { redo(); return PageID::PAINT; }
 
-    // 🧹 LÖSCHEN (NEU & FINAL)
+    // Löschen
     if (inRect(302, 74, 16, 134, x, y)) {
         undoStack.clear();
         redoStack.clear();
@@ -200,12 +214,14 @@ PageID PaintPage::handleTouch(int x, int y,
         eraserDown = false;
         needsRedraw = true;
         return PageID::PAINT;
+        Serial.println("Canvas Cleared");
     }
 
     // Hauptmenü
     if (inRect(0, 78, 14, 134, x, y)) {
         onLeave();
         return PageID::HOME;
+        Serial.println("Returning to Home Page");
     }
 
     // Zeichenfläche
@@ -222,6 +238,7 @@ PageID PaintPage::handleTouch(int x, int y,
             lastY = curY = y;
 
             currentStroke.points.push_back({x, y});
+            Serial.println("Starting New Stroke");
         } else {
             curX = x;
             curY = y;
