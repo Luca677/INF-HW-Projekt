@@ -34,7 +34,7 @@ void PaintPage::onLeave() {
 // Drawing
 // --------------------------------------------------
 void PaintPage::draw(Adafruit_ILI9341& tft) {
-
+    Serial.println("Needs Redraw: " + String(needsRedraw));
     // 1️⃣ UI + alle gespeicherten Striche
     if (needsRedraw) {
         tft.drawRGBBitmap(0, 0, paintBitmap, PAINT_W, PAINT_H);
@@ -105,7 +105,6 @@ void PaintPage::penUp() {
         currentStroke.points.clear();
     }
     penDown = false;
-    Serial.println("Pen Up");
 }
 
 void PaintPage::eraserUp() {
@@ -115,7 +114,6 @@ void PaintPage::eraserUp() {
         currentStroke.points.clear();
     }
     eraserDown = false;
-    Serial.println("Eraser Up");
 }
 
 // --------------------------------------------------
