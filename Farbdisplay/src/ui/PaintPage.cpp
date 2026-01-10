@@ -35,7 +35,7 @@ void PaintPage::onLeave() {
 // --------------------------------------------------
 void PaintPage::draw(Adafruit_ILI9341& tft) {
     Serial.println("Needs Redraw: " + String(needsRedraw));
-    // 1️⃣ UI + alle gespeicherten Striche
+    // UI + alle gespeicherten Striche
     if (needsRedraw) {
         tft.drawRGBBitmap(0, 0, paintBitmap, PAINT_W, PAINT_H);
 
@@ -61,7 +61,7 @@ void PaintPage::draw(Adafruit_ILI9341& tft) {
         needsRedraw = false;
     }
 
-    // 2️⃣ ColorPicker Overlay
+    //  ColorPicker Overlay
     if (overlay == PaintOverlay::COLOR_PICKER) {
         tft.drawRGBBitmap(
             18, 52,
@@ -73,7 +73,7 @@ void PaintPage::draw(Adafruit_ILI9341& tft) {
         return;
     }
 
-    // 3️⃣ Live-Zeichnen
+    // Live-Zeichnen
     if (penDown || eraserDown) {
         uint16_t color = penActive ? currentColor : ILI9341_WHITE;
 
