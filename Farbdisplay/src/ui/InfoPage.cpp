@@ -5,11 +5,11 @@ static bool inRect(int x, int y, int w, int h, int tx, int ty) {
 }
 
 void InfoPage::onEnter() {
-    needsRedraw = true;   // 🔥 NUR BEIM BETRETEN
+    needsRedraw = true;
 }
 
 void InfoPage::draw(Adafruit_ILI9341& tft) {
-    if (!needsRedraw) return;   // 🚨 DAS WAR DER FEHLER
+    if (!needsRedraw) return;
 
     needsRedraw = false;
 
