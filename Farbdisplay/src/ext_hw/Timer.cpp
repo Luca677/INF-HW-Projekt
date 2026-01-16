@@ -13,7 +13,6 @@ void timerInit() {
     // TIM2 HardwareTimer Objekt erstellen
     timer = new HardwareTimer(TIM2);
 
-    // 80 MHz / 8000 = 10 kHz → Overflow 100 = 10 ms
     timer->setPrescaleFactor(8000);
     timer->setOverflow(100);
 
